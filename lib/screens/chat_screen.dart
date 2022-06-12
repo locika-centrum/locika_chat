@@ -35,11 +35,17 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
 
     startChat();
+    timer = Timer.periodic(
+      /// Fetch the status of the available rooms every x seconds
+      const Duration(seconds: 2),
+      (Timer t) => fetchChat(),
+    );
   }
 
   @override
   void dispose() {
     super.dispose();
+    timer?.cancel();
   }
 
   Future<void> startChat() async {
@@ -96,8 +102,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                       vertical: 4,
                                       horizontal: 8,
                                     ),
-                                    child:
-                                        _buildChatItem(snapshot.data![index]),
+                                    child: _buildChatItem(
+                                        snapshot.data![index], context),
                                   );
                                 },
                               )
@@ -107,7 +113,9 @@ class _ChatScreenState extends State<ChatScreen> {
                     SafeArea(
                       child: Row(
                         children: const [
-                          SizedBox(width: 8,),
+                          SizedBox(
+                            width: 8,
+                          ),
                           Text('TODO - tady bude input field'),
                         ],
                       ),
@@ -120,13 +128,17 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Bubble _buildChatItem(ChatMessage message) {
+  Bubble _buildChatItem(ChatMessage message, BuildContext context) {
     _log.finest('${message.sysMessage} > ${message.message}');
     return Bubble(
       nip: BubbleNip.leftBottom,
       color: message.sysMessage == 'Pracovník chatu' ? Colors.lime : null,
       alignment: Alignment.topLeft,
-      child: Text(message.message),
+      child: Text(message.message,
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium
+              ?.copyWith(color: Colors.black)),
     );
   }
 }
