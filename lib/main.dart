@@ -77,7 +77,8 @@ class MyApp extends StatelessWidget {
         builder: (context, state) {
           String? chatID = state.params['id'];
 
-          return ChatScreen(chatID: chatID,);
+          // TODO check if chatID is null
+          return ChatScreen(advisorID: chatID!,);
         },
       ),
     ],
@@ -88,11 +89,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    _log.finest('Starting with parameters:\n'
-        '  > Nick name: ${AppSettings.nickName.value}\n'
-        '  > Age category: ${AppSettings.ageCategory.value}\n'
-        '  > Game size: ${AppSettings.gameSize.value}\n'
-        '  > Violet mode: ${AppSettings.violetModeOn.value}');
+    _log.finest('Starting with parameters: ${AppSettings.allSettings}');
     return MaterialApp.router(
       title: 'Locika chat',
       theme: AppTheme.lightTheme,

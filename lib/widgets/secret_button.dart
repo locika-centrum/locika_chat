@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../providers/app_settings.dart';
+
 class SecretButton extends StatelessWidget {
   // set to 0.0 in final version to hide the secret button
   static const _opacity = 0.1;
@@ -12,7 +14,9 @@ class SecretButton extends StatelessWidget {
     return Opacity(
       opacity: _opacity,
       child: FloatingActionButton(onPressed: () {
-        _showOptions(context);
+        if (AppSettings.isEligibleForVioletMode() && AppSettings.violetModeOn.value) {
+          _showOptions(context);
+        }
       }),
     );
   }

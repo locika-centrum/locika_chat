@@ -63,7 +63,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 onTap: () {
                   Navigator.pop(context);
                   GoRouter.of(context)
-                      .push('/chat/${snapshot.data![index].chatID}');
+                      .push('/chat/${snapshot.data![index].advisorID}');
                 },
                 child: Card(
                   child: ListTile(
