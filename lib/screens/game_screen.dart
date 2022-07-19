@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../providers/app_settings.dart';
 import '../widgets/secret_button.dart';
 
 class GameScreen extends StatelessWidget {
   final int gameSize;
+  final bool secretEnabled =
+      AppSettings.violetModeOn.value && AppSettings.isEligibleForVioletMode();
 
-  const GameScreen({Key? key, this.gameSize = 0}) : super(key: key);
+  GameScreen({Key? key, this.gameSize = 0}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +18,7 @@ class GameScreen extends StatelessWidget {
         title: Text('Naše supr hra'),
         elevation: 0,
       ),
-      floatingActionButton: const SecretButton(),
+      floatingActionButton: secretEnabled ? const SecretButton() : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
     );
   }

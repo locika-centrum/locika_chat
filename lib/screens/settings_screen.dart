@@ -94,17 +94,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 leading: const Icon(Icons.lock),
                 title: const Text('Fialový mód'),
               ),
-              SettingsTile.navigation(
-                title: const Text('Nick name'),
-                value: ValueListenableBuilder<String?>(
-                  builder: (BuildContext context, String? value, Widget? child) {
-                    return Text(value ?? '');
-                  },
-                  valueListenable: AppSettings.nickName,
-                ),
-                onPressed: (context) =>
-                    GoRouter.of(context).push('/settings/nick_name'),
-              )
             ],
           ),
       ]),

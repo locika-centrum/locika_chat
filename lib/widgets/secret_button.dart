@@ -45,7 +45,7 @@ class SecretButton extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
-                        GoRouter.of(context).push('/chat_room');
+                        GoRouter.of(context).push('/login');
                       },
                       child: const Text('OK'),
                     ),
@@ -57,19 +57,5 @@ class SecretButton extends StatelessWidget {
         );
       },
     );
-  }
-
-  void _showOptionsOLD(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Äas na pauzu?"),
-            actions: [
-              TextButton(onPressed: () {}, child: const Text('ZpÄt')),
-              TextButton(onPressed: () {}, child: const Text('OK')),
-            ],
-          );
-        });
   }
 }

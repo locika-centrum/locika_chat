@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:locika_chat/providers/app_settings.dart';
 
+import '../providers/app_settings.dart';
 import '../responsive_ui/two_sections_ui.dart';
 
 class MainScreen extends StatelessWidget {
@@ -15,7 +16,7 @@ class MainScreen extends StatelessWidget {
         title: const Text('Naše supr hra'),
       ),
       body: TwoSectionUI(
-        firstSection: const Text('logo'),
+        firstSection: SvgPicture.asset('assets/images/sloth_01.svg'),
         secondSection: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [

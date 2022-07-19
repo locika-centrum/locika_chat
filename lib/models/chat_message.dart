@@ -14,5 +14,5 @@ class ChatMessage {
   });
 
   @override
-  String toString() => '($advisorID [$chatID]) - $message';
+  String toString() => '($sysMessage: $advisorID [$chatID]) - $message';
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
@@ -10,9 +12,11 @@ import './screens/game_screen.dart';
 import './screens/settings_screen.dart';
 import './screens/settings/settings_category.dart';
 import './screens/settings/settings_game_size.dart';
-import './screens/settings/settings_nick_name.dart';
 import './screens/chat_room_screen.dart';
 import './screens/chat_screen.dart';
+import './screens/login_screen.dart';
+import './screens/register_screen.dart';
+import './screens/network_error_screen.dart';
 
 Logger _log = Logger('main.dart');
 
@@ -65,12 +69,30 @@ class MyApp extends StatelessWidget {
         builder: (context, state) => const SettingsGameSizeScreen(),
       ),
       GoRoute(
-        path: '/settings/nick_name',
-        builder: (context, state) => const SettingsNickNameScreen(),
+        path: '/login',
+        builder: (context, state) {
+          return LoginScreen(
+            nextRoute: '/chat_room',
+            setCookie: (Cookie cookie) => AppSettings.setCookie(cookie),
+            nickName: AppSettings.nickName.value,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/register',
+        builder: (context, state) {
+          return RegisterScreen(
+            nextRoute: '/chat_room',
+            setCookie: (Cookie cookie) => AppSettings.setCookie(cookie),
+            setNick: (String nickName) => AppSettings.setNickName(nickName),
+          );
+        },
       ),
       GoRoute(
         path: '/chat_room',
-        builder: (context, state) => ChatRoomScreen(),
+        builder: (context, state) => ChatRoomScreen(
+          cookie: AppSettings.cookie.value!,
+        ),
       ),
       GoRoute(
         path: '/chat/:id',
@@ -78,9 +100,15 @@ class MyApp extends StatelessWidget {
           String? chatID = state.params['id'];
 
           // TODO check if chatID is null
-          return ChatScreen(advisorID: chatID!,);
+          return ChatScreen(
+            advisorID: chatID!,
+          );
         },
       ),
+      GoRoute(
+        path: '/network_error',
+        builder: (context, state) => const NetworkErrorScreen(),
+      )
     ],
   );
 

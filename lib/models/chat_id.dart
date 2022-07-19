@@ -1,5 +1,6 @@
 import '../providers/app_settings.dart';
 
+@Deprecated('Should be replaced in new parser')
 class ChatID {
   late String advisorID;
   late String chatID;
