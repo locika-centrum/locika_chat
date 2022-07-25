@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-import '../providers/app_settings.dart';
 import '../responsive_ui/two_sections_ui.dart';
 
 class MainScreen extends StatelessWidget {
@@ -16,7 +15,10 @@ class MainScreen extends StatelessWidget {
         title: const Text('Naše supr hra'),
       ),
       body: TwoSectionUI(
-        firstSection: SvgPicture.asset('assets/images/sloth_01.svg'),
+        firstSection: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SvgPicture.asset('assets/images/monster_01.svg'),
+        ),
         secondSection: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -25,7 +27,7 @@ class MainScreen extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () {
                   GoRouter.of(context)
-                      .push('/game?size=${AppSettings.gameSize.value}');
+                      .push('/game');
                 },
                 child: const Text('Hra'),
               ),

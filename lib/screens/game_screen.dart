@@ -1,14 +1,20 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-import '../providers/app_settings.dart';
+import 'package:flutter/material.dart';
+import 'package:locika_game_test/widgets/game_board_widget.dart';
+import 'package:locika_game_test/widgets/game_score_widget.dart';
+
 import '../widgets/secret_button.dart';
 
 class GameScreen extends StatelessWidget {
+  final bool secretEnabled;
   final int gameSize;
-  final bool secretEnabled =
-      AppSettings.violetModeOn.value && AppSettings.isEligibleForVioletMode();
 
-  GameScreen({Key? key, this.gameSize = 0}) : super(key: key);
+  GameScreen({
+    this.gameSize = 0,
+    this.secretEnabled = false,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +26,15 @@ class GameScreen extends StatelessWidget {
       ),
       floatingActionButton: secretEnabled ? const SecretButton() : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
+      body: Column(
+        children: [
+          GameBoardWidget(gameSize: this.gameSize),
+          const Spacer(),
+          GameScoreWidget(),
+          const Spacer(),
+        ],
+      ),
+      bottomNavigationBar: SafeArea(child: Text('')),
     );
   }
 }

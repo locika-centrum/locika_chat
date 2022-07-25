@@ -10,13 +10,15 @@ Logger _log = Logger('LoginScreen');
 
 class LoginScreen extends StatefulWidget {
   final String nextRoute;
-  final Function setCookie;
   final String? nickName;
+  final Function setCookie;
+  final Function setNick;
 
   LoginScreen({
     required this.nextRoute,
-    required this.setCookie,
     this.nickName,
+    required this.setCookie,
+    required this.setNick,
     Key? key,
   }) : super(key: key);
 
@@ -118,6 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
       case 200:
         this._isValidForm = true;
         Navigator.pop(context);
+        widget.setNick(username);
         widget.setCookie(result.cookie);
 
         GoRouter.of(context).push(widget.nextRoute);

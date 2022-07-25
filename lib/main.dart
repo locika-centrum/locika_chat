@@ -49,9 +49,14 @@ class MyApp extends StatelessWidget {
       GoRoute(
         path: '/game',
         builder: (context, state) {
-          final gameSize = int.parse(state.queryParams['size']!);
-          _log.finest(gameSize);
-          return GameScreen(gameSize: gameSize);
+          // _log.finest('Initializing new game with size ${AppSettings.gameSize.value}');
+          // Game().newGame(size: AppSettings.gameSize.value);
+
+          return GameScreen(
+            secretEnabled: AppSettings.violetModeOn.value &&
+                AppSettings.isEligibleForVioletMode(),
+            gameSize: AppSettings.gameSize.value,
+          );
         },
       ),
       GoRoute(
@@ -73,8 +78,9 @@ class MyApp extends StatelessWidget {
         builder: (context, state) {
           return LoginScreen(
             nextRoute: '/chat_room',
-            setCookie: (Cookie cookie) => AppSettings.setCookie(cookie),
             nickName: AppSettings.nickName.value,
+            setCookie: (Cookie cookie) => AppSettings.setCookie(cookie),
+            setNick: (String nickName) => AppSettings.setNickName(nickName),
           );
         },
       ),
@@ -101,6 +107,9 @@ class MyApp extends StatelessWidget {
 
           // TODO check if chatID is null
           return ChatScreen(
+            nickName: AppSettings.nickName.value!,
+            cookie: AppSettings.cookie.value!,
+            setCookie: (Cookie cookie) => AppSettings.setCookie(cookie),
             advisorID: chatID!,
           );
         },
