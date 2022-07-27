@@ -1,10 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:locika_game_test/widgets/game_board_widget.dart';
-import 'package:locika_game_test/widgets/game_score_widget.dart';
 
 import '../widgets/secret_button.dart';
+import '../widgets/game_board_widget.dart';
+import '../widgets/game_score_widget.dart';
 
 class GameScreen extends StatelessWidget {
   final bool secretEnabled;

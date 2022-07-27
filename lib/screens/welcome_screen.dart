@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../responsive_ui/two_sections_ui.dart';
 import '../widgets/welcome_options.dart';
@@ -11,10 +12,13 @@ class WelcomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        title: const Text('Naše supr hra'),
+        title: const Text('Hraj s příšerou'),
       ),
-      body: const TwoSectionUI(
-        firstSection: Text('logo'),
+      body: TwoSectionUI(
+        firstSection: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 64),
+          child: SvgPicture.asset('assets/images/monster_02.svg'),
+        ),
         secondSection: WelcomeOptions(),
       ),
     );

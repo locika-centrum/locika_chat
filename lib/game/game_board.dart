@@ -19,6 +19,7 @@ const List<List<int>> tupleEval = [
 class GameBoard {
   final int size;
   late List<List<int?>> _board;
+  late List<List<bool>> _surrounding;
   late int _symbol;
   late int _winSequenceLength;
   late int _rows, _cols;
@@ -26,6 +27,7 @@ class GameBoard {
   int? _winSymbol;
 
   List<List<int?>> get board => this._board;
+  List<List<bool>> get surrounding => this._surrounding;
   int get rows => this._rows;
   int get cols => this._cols;
   int get activeSymbol => this._symbol;
@@ -54,13 +56,23 @@ class GameBoard {
         this._winSequenceLength = 3;
     }
     this._board = List.generate(
-        this._rows,
-        (index) => List.generate(
-              this._cols,
-              (index) => null,
-              growable: false,
-            ),
-        growable: false);
+      this._rows,
+      (index) => List.generate(
+        this._cols,
+        (index) => null,
+        growable: false,
+      ),
+      growable: false,
+    );
+    this._surrounding = List.generate(
+      this._rows,
+      (index) => List.generate(
+        this._cols,
+        (index) => false,
+        growable: false,
+      ),
+      growable: false,
+    );
     this._availableMoves = this._rows * this._cols;
   }
 
@@ -74,6 +86,14 @@ class GameBoard {
       this._symbol = 1 - this._symbol;
       this._availableMoves--;
 
+      int diameter = (this._winSequenceLength / 2).floor();
+      for (int i = -diameter; i <= diameter; i++) {
+        for (int j = -diameter; j <= diameter; j++) {
+          if (row + i >= 0 && row + i < _rows && col + j >= 0 && col + j < _cols)
+            this._surrounding[row + i][col + j] = true;
+        }
+      }
+
       result.value = _evaluateMove(this, result, true);
       if (result.value >= WIN) this._winSymbol = 1 - this._symbol;
     }
@@ -81,7 +101,9 @@ class GameBoard {
   }
 
   GameMove? recordMove(GameMove? move, {bool ownMove = true}) {
-    return (move == null) ? null : recordCoordinates(move.row, move.col, ownMove: ownMove);
+    return (move == null)
+        ? null
+        : recordCoordinates(move.row, move.col, ownMove: ownMove);
   }
 
   int? revokeCoordinates(int row, int col) {
@@ -89,6 +111,7 @@ class GameBoard {
 
     if (originalSymbol != null) {
       this._board[row][col] = null;
+      this._symbol = 1 - this._symbol;
       this._availableMoves++;
     }
 
@@ -101,9 +124,10 @@ class GameBoard {
 
   GameBoard clone() {
     GameBoard result = GameBoard(size: this.size, startSymbol: this._symbol);
-    for (int row = 0; row < result.rows; row++) {
-      for (int col = 0; col < result.cols; col++) {
-        result.board[row][col] = this.board[row][col];
+    for (int row = 0; row < result._rows; row++) {
+      for (int col = 0; col < result._cols; col++) {
+        result._board[row][col] = this._board[row][col];
+        result._surrounding[row][col] = this._surrounding[row][col];
       }
     }
     result._availableMoves = this._availableMoves;
@@ -118,7 +142,7 @@ class GameBoard {
     for (GameMoveTuple tuple in listOfTuples) {
       if (!tuple.bothSymbols) {
         moveValue += tupleEval[board.winSequenceLength - 1]
-        [tuple.symbolCount[move.symbol!]];
+            [tuple.symbolCount[move.symbol!]];
       }
       // TODO perhaps I need to compare the original value - we will see ;)
     }
@@ -139,7 +163,7 @@ class GameBoard {
             row: move.row,
             col: move.col + i - (winSequenceLength - 1) + j,
             symbol: board.board[move.row]
-            [move.col + i - (winSequenceLength - 1) + j],
+                [move.col + i - (winSequenceLength - 1) + j],
           ));
         result.add(tuple);
       }
@@ -155,7 +179,7 @@ class GameBoard {
             row: move.row + i - (winSequenceLength - 1) + j,
             col: move.col,
             symbol: board.board[move.row + i - (winSequenceLength - 1) + j]
-            [move.col],
+                [move.col],
           ));
         result.add(tuple);
       }
@@ -173,7 +197,7 @@ class GameBoard {
             row: move.row + i - (winSequenceLength - 1) + j,
             col: move.col + i - (winSequenceLength - 1) + j,
             symbol: board.board[move.row + i - (winSequenceLength - 1) + j]
-            [move.col + i - (winSequenceLength - 1) + j],
+                [move.col + i - (winSequenceLength - 1) + j],
           ));
         result.add(tuple);
       }
@@ -192,7 +216,7 @@ class GameBoard {
             row: move.row - i + (winSequenceLength - 1) - j,
             col: move.col + i - (winSequenceLength - 1) + j,
             symbol: board.board[move.row - i + (winSequenceLength - 1) - j]
-            [move.col + i - (winSequenceLength - 1) + j],
+                [move.col + i - (winSequenceLength - 1) + j],
           ));
         result.add(tuple);
       }

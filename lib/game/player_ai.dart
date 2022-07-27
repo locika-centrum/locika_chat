@@ -7,13 +7,14 @@ import './game_board.dart';
 
 const INT_INFINITY = 999999;
 const WIN = 200000;
-const MIN_MAX_DEPTH = 1;
+const MIN_DEPTH = 1;
+const MAX_DEPTH = 3;
 
 const List<List<int>> tupleEval = [
   [], // not applicable
   [], // not applicable
   [0, 1, 1751, WIN], // three in row
-  [0, 1, 73, 1751, WIN], // four in row
+  [0, 1, 511, 1751, WIN], // four in row
   [0, 1, 73, 511, 1751, WIN], // five in row
 ];
 
@@ -24,10 +25,12 @@ class PlayerAI {
     List<GameMove> bestMoves = [];
     int bestMoveValue = -INT_INFINITY;
 
-    for (GameMove move in _possibleMoves(board)) {
+    List<GameMove> possibleMoves = _possibleMoves(board);
+    _log.finest('Possible moves: ${possibleMoves.length}');
+    for (GameMove move in possibleMoves) {
       GameBoard newBoard = board.clone();
       newBoard.recordMove(move);
-      int moveValue = _MinMax(newBoard, move, MIN_MAX_DEPTH, -INT_INFINITY, INT_INFINITY, false);
+      int moveValue = _MinMax(newBoard, move, possibleMoves.length > 50 ? MIN_DEPTH : MAX_DEPTH, -INT_INFINITY, INT_INFINITY, false);
       if (moveValue > bestMoveValue) {
         bestMoves.clear();
         bestMoveValue = moveValue;
@@ -41,8 +44,8 @@ class PlayerAI {
 
   int _MinMax(GameBoard board, GameMove move, int depth, int alpha, int beta, bool maximizingPlayer) {
     int moveValue = _evaluateMove(board, move, !maximizingPlayer);
-    _log.finest(
-        'MinMax${List.filled(2 * (3 - depth), " ").join()} - ${board.board} / ${move} -> ${moveValue}');
+//    _log.finest(
+//        'MinMax${List.filled(2 * (3 - depth), " ").join()} - ${board.board} / ${move} -> ${moveValue}');
 
     if (depth == 0 || moveValue.abs() >= WIN || board.availableMoves == 0) {
       return moveValue;
@@ -76,6 +79,23 @@ class PlayerAI {
   }
 
   List<GameMove> _possibleMoves(GameBoard board) {
+    List<GameMove> result = [];
+
+    for (int row = 0; row < board.rows; row++) {
+      for (int col = 0; col < board.cols; col++) {
+        if (board.surrounding[row][col]) {
+          if (board.board[row][col] == null) {
+            result.add(
+                GameMove(row: row, col: col, symbol: board.activeSymbol));
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
+  List<GameMove> _possibleMovesOLD(GameBoard board) {
     List<GameMove> result = [];
 
     for (int row = 0; row < board.rows; row++) {

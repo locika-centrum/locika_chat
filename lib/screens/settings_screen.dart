@@ -42,9 +42,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: ValueListenableBuilder<int?>(
                 builder: (BuildContext context, int? value, Widget? child) {
                   _log.finest('Category = ${AppSettings.ageCategory.value}');
-                  return Text(AppSettings.getAgeCategories()[
-                      AppSettings.ageCategory.value ??
-                          AppSettings.getAgeCategories().length - 1]);
+                  return Text(AppSettings.getAgeCategories()[AppSettings
+                          .ageCategory.value ??
+                      AppSettings.getAgeCategories().length - 1]['category']);
                 },
                 valueListenable: AppSettings.ageCategory,
               ),
@@ -86,16 +86,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: const Text('Speciální'),
             tiles: <SettingsTile>[
               SettingsTile.switchTile(
-                onToggle: (value) =>
-                  setState(() {
-                    AppSettings.toggleVioletMode();
-                  }),
+                onToggle: (value) => setState(() {
+                  AppSettings.toggleVioletMode();
+                }),
                 initialValue: AppSettings.violetModeOn.value,
                 leading: const Icon(Icons.lock),
                 title: const Text('Fialový mód'),
               ),
             ],
           ),
+        SettingsSection(
+          tiles: <SettingsTile>[
+            SettingsTile.navigation(
+              leading: const Icon(Icons.info_outline),
+              title: const Text('O aplikaci'),
+              onPressed: (context) => GoRouter.of(context).push('/about'),
+            ),
+            SettingsTile(
+              leading: const Icon(
+                Icons.redo,
+                color: Colors.red,
+              ),
+              title: const Text(
+                'Resetovat aplikaci',
+                style: TextStyle(
+                  color: Colors.red,
+                ),
+              ),
+              onPressed: (context) {
+                AppSettings.resetAll();
+                _log.finest('${AppSettings.allSettings}');
+
+                SnackBar snackBar = const SnackBar(
+                  content: Text('Data aplikace jsou smazaná'),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+                GoRouter.of(context).go('/welcome');
+              },
+            )
+          ],
+        ),
       ]),
     );
   }

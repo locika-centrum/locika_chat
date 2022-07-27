@@ -10,7 +10,12 @@ class AppSettings {
   static final List<Map> _optionPreferences = [
     {
       'key': 'age_category',
-      'values': ['dítě', 'teenager', 'student', 'dospělý'],
+      'values': [
+        {'category': 'dítě', 'title': 'Lehká', 'subtitle': 'vhodné pro děti'},
+        {'category': 'teenager', 'title': 'Základní', 'subtitle': 'vhodné pro školáky'},
+        {'category': 'student', 'title': 'Střední', 'subtitle': 'vhodné pro studenty'},
+        {'category': 'dospělý', 'title': 'Expert', 'subtitle': 'vhodné pro dospělé'},
+      ],
     },
     {
       'key': 'game_size',
@@ -80,7 +85,7 @@ class AppSettings {
     return ageCategory.value! < getAgeCategories().length - 1;
   }
 
-  static List<String> getAgeCategories() {
+  static List<Map> getAgeCategories() {
     return _optionPreferences
         .singleWhere((element) => element['key'] == 'age_category')['values'];
   }
@@ -111,6 +116,24 @@ class AppSettings {
         'Game size: ${AppSettings.gameSize.value}, '
         'Violet mode: ${AppSettings.violetModeOn.value}, '
         'Chat ID: ${AppSettings.chatID.value}, '
+        'Advisor ID: ${AppSettings.advisorID.value}, '
         'Cookie: ${AppSettings.cookie.value}}';
+  }
+
+  static void resetScore() {
+    // TODO
+  }
+
+  static Future<void> resetAll() async {
+    await _preferences.clear();
+
+    nickName =
+        ValueNotifier(_preferences.getString('nick_name'));
+    violetModeOn =
+        ValueNotifier(_preferences.getBool('violet_mode') ?? false);
+    gameSize =
+        ValueNotifier(_preferences.getInt('game_size') ?? 0);
+    chatID =
+        ValueNotifier(_preferences.getString('chat_id'));
   }
 }

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:logging/logging.dart';
+
 import '../providers/app_settings.dart';
+import '../widgets/welcome_option_button.dart';
+
+Logger _log = Logger('WelcomeOptions');
 
 class WelcomeOptions extends StatelessWidget {
-  final bool showTitle;
-
-  const WelcomeOptions({Key? key, this.showTitle = true}) : super(key: key);
+  const WelcomeOptions({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,18 +18,41 @@ class WelcomeOptions extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (showTitle)
-            Text(
-              'Vítej',
-              style: Theme.of(context).textTheme.titleLarge,
+          Text(
+            'Vyber si úroveň obtížnosti a začni hrát.',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          SizedBox(
+            height: 16,
+          ),
+          LimitedBox(
+            maxHeight: 250,
+            child: ListView.builder(
+              itemCount: AppSettings.getAgeCategories().length,
+              itemBuilder: (BuildContext ctx, int index) {
+                return WelcomeOptionButton(
+                  title: AppSettings.getAgeCategories()[index]['title'],
+                  subtitle: AppSettings.getAgeCategories()[index]['subtitle'],
+                  routeToMain: () {
+                    routeToMain(ctx, index);
+                  },
+                );
+              },
             ),
-          if (showTitle)
-            const Text(
-                'Vyber si vlastní kategorii, ať hru přizpůsobíme tvému věku'),
-          Center(
-            child: SizedBox(
-              height: 200,
-              width: 200,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void routeToMain(BuildContext context, int index) {
+    _log.finest('Route to ${index} category');
+    AppSettings.setAgeCategory(index);
+    GoRouter.of(context).go('/');
+  }
+}
+
+/*
               child: ListView.builder(
                 padding: const EdgeInsets.all(8),
                 itemCount: AppSettings.getAgeCategories().length,
@@ -40,10 +66,4 @@ class WelcomeOptions extends StatelessWidget {
                   );
                 },
               ),
-            ),
-          )
-        ],
-      ),
-    );
-  }
-}
+*/

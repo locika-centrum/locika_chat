@@ -17,6 +17,7 @@ import './screens/chat_screen.dart';
 import './screens/login_screen.dart';
 import './screens/register_screen.dart';
 import './screens/network_error_screen.dart';
+import './screens/about_screen.dart';
 
 Logger _log = Logger('main.dart');
 
@@ -45,6 +46,10 @@ class MyApp extends StatelessWidget {
       GoRoute(
         path: '/welcome',
         builder: (context, state) => const WelcomeScreen(),
+      ),
+      GoRoute(
+        path: '/about',
+        builder: (context, state) => const AboutScreen(),
       ),
       GoRoute(
         path: '/game',

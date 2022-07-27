@@ -39,7 +39,7 @@ class _SettingsCategoryScreenState extends State<SettingsCategoryScreen> {
         index < AppSettings.getAgeCategories().length;
         index++) {
       result.add(SettingsTile(
-        title: Text(AppSettings.getAgeCategories()[index]),
+        title: Text(AppSettings.getAgeCategories()[index]['category']),
         trailing: Icon(
             index == AppSettings.ageCategory.value ? Icons.visibility : null),
         onPressed: (context) {
