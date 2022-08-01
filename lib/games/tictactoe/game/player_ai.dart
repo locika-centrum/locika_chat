@@ -1,14 +1,14 @@
 import 'dart:math';
 import 'package:logging/logging.dart';
 
-import '../models/game_move.dart';
-import '../models/game_move_tuple.dart';
-import './game_board.dart';
+import 'game_move.dart';
+import 'game_move_tuple.dart';
+import 'game_board.dart';
 
 const INT_INFINITY = 999999;
 const WIN = 200000;
 const MIN_DEPTH = 1;
-const MAX_DEPTH = 3;
+const MAX_DEPTH = 1;
 
 const List<List<int>> tupleEval = [
   [], // not applicable
@@ -29,13 +29,12 @@ class PlayerAI {
     _log.finest('Possible moves: ${possibleMoves.length}');
     for (GameMove move in possibleMoves) {
       GameBoard newBoard = board.clone();
-      newBoard.recordMove(move);
-      int moveValue = _MinMax(newBoard, move, possibleMoves.length > 50 ? MIN_DEPTH : MAX_DEPTH, -INT_INFINITY, INT_INFINITY, false);
+      GameMove? newMove = newBoard.recordMove(move);
+      int moveValue = _MinMax(newBoard, newMove!, possibleMoves.length > 50 ? MIN_DEPTH : MAX_DEPTH, -INT_INFINITY, INT_INFINITY, false);
       if (moveValue > bestMoveValue) {
         bestMoves.clear();
         bestMoveValue = moveValue;
-        move.value = moveValue;
-        bestMoves.add(move);
+        bestMoves.add(newMove);
       }
     }
 
@@ -43,20 +42,20 @@ class PlayerAI {
   }
 
   int _MinMax(GameBoard board, GameMove move, int depth, int alpha, int beta, bool maximizingPlayer) {
-    int moveValue = _evaluateMove(board, move, !maximizingPlayer);
-//    _log.finest(
-//        'MinMax${List.filled(2 * (3 - depth), " ").join()} - ${board.board} / ${move} -> ${moveValue}');
+    // int moveValue = _evaluateMove(board, move, !maximizingPlayer);
+    _log.finest(
+        'MinMax${List.filled(2 * (3 - depth), " ").join()} - ${board.board} / ${move} -> ${move.value}');
 
-    if (depth == 0 || moveValue.abs() >= WIN || board.availableMoves == 0) {
-      return moveValue;
+    if (depth == 0 || move.value.abs() >= WIN || board.availableMoves == 0) {
+      return move.value;
     }
 
     if (maximizingPlayer) {
       int bestMoveValue = -INT_INFINITY;
       for (GameMove move in _possibleMoves(board)) {
         GameBoard newBoard = board.clone();
-        newBoard.recordMove(move);
-        bestMoveValue = max(bestMoveValue, _MinMax(newBoard, move, depth - 1, alpha, beta, false));
+        GameMove? newMove = newBoard.recordMove(move);
+        bestMoveValue = max(bestMoveValue, _MinMax(newBoard, newMove!, depth - 1, alpha, beta, false));
         alpha = max(alpha, bestMoveValue);
 
         if (alpha >= beta) break;
@@ -67,8 +66,8 @@ class PlayerAI {
       int bestMoveValue = INT_INFINITY;
       for (GameMove move in _possibleMoves(board)) {
         GameBoard newBoard = board.clone();
-        newBoard.recordMove(move);
-        bestMoveValue = min(bestMoveValue, _MinMax(newBoard, move, depth - 1, alpha, beta, true));
+        GameMove? newMove = newBoard.recordMove(move, ownMove: false);
+        bestMoveValue = min(bestMoveValue, _MinMax(newBoard, newMove!, depth - 1, alpha, beta, true));
         beta = min(beta, bestMoveValue);
 
         if (beta <= alpha) break;

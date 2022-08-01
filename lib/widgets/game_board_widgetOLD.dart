@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
-import '../game/player_ai.dart';
-import '../game/game_board.dart';
-import '../models/game_move.dart';
+import '../games/tictactoe/game/player_ai.dart';
+import '../games/tictactoe/game/game_board.dart';
+import '../games/tictactoe/game/game_move.dart';
 
 Logger _log = Logger('GameBoard Widget');
 
 class GameBoardWidget extends StatefulWidget {
   final int gameSize;
+  final Function changeScore;
 
-  GameBoardWidget({int this.gameSize = 0, Key? key}) : super(key: key);
+  GameBoardWidget({
+    int this.gameSize = 0,
+    required this.changeScore,
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<GameBoardWidget> createState() =>
@@ -117,12 +122,14 @@ class _GameBoardWidgetState extends State<GameBoardWidget> {
 
           if (gameBoard.winSymbol != null) {
             // Move was winning move
-            _log.finest('*** VICTORY ***');
+            _log.finest('*** VICTORY for ${gameBoard.winSymbol} ***');
+            widget.changeScore(gameBoard.winSymbol == 0 ? 1 : -1);
             return;
           } else {
             if (gameBoard.availableMoves == 0) {
               // No further moves are possible
               _log.finest('*** DRAW ***');
+              widget.changeScore(0);
               return;
             }
           }

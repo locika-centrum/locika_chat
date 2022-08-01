@@ -1,4 +1,4 @@
-import './game_move.dart';
+import 'game_move.dart';
 
 class GameMoveTuple {
   List<GameMove> moves = [];

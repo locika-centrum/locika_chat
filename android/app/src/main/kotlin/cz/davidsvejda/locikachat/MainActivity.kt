@@ -1,4 +1,4 @@
-package com.example.locika_chat
+package cz.davidsvejda.locikachat
 
 import io.flutter.embedding.android.FlutterActivity
 

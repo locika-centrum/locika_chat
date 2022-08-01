@@ -28,11 +28,11 @@ class WelcomeOptions extends StatelessWidget {
           LimitedBox(
             maxHeight: 250,
             child: ListView.builder(
-              itemCount: AppSettings.getAgeCategories().length,
+              itemCount: AppSettings().data.ageCategories.length,
               itemBuilder: (BuildContext ctx, int index) {
                 return WelcomeOptionButton(
-                  title: AppSettings.getAgeCategories()[index]['title'],
-                  subtitle: AppSettings.getAgeCategories()[index]['subtitle'],
+                  title: AppSettings().data.ageCategories[index]['title'],
+                  subtitle: AppSettings().data.ageCategories[index]['subtitle'],
                   routeToMain: () {
                     routeToMain(ctx, index);
                   },
@@ -47,23 +47,7 @@ class WelcomeOptions extends StatelessWidget {
 
   void routeToMain(BuildContext context, int index) {
     _log.finest('Route to ${index} category');
-    AppSettings.setAgeCategory(index);
+    AppSettings().data.setAgeCategory(index);
     GoRouter.of(context).go('/');
   }
 }
-
-/*
-              child: ListView.builder(
-                padding: const EdgeInsets.all(8),
-                itemCount: AppSettings.getAgeCategories().length,
-                itemBuilder: (BuildContext ctx, int index) {
-                  return ElevatedButton(
-                    onPressed: () {
-                      AppSettings.setAgeCategory(index);
-                      GoRouter.of(context).go('/');
-                    },
-                    child: Text(AppSettings.getAgeCategories()[index]),
-                  );
-                },
-              ),
-*/

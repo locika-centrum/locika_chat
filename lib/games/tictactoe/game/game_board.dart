@@ -1,10 +1,10 @@
 import 'dart:math';
 import 'package:logging/logging.dart';
 
-import '../models/game_move.dart';
-import '../models/game_move_tuple.dart';
+import './game_move.dart';
+import './game_move_tuple.dart';
 
-Logger _log = Logger('GameBoard');
+Logger _log = Logger('GameBoard - tictactoe');
 
 const WIN = 200000;
 
@@ -12,7 +12,7 @@ const List<List<int>> tupleEval = [
   [], // not applicable
   [], // not applicable
   [0, 1, 1751, WIN], // three in row
-  [0, 1, 73, 1751, WIN], // four in row
+  [0, 1, 511, 1751, WIN], // four in row
   [0, 1, 73, 511, 1751, WIN], // five in row
 ];
 
@@ -94,7 +94,7 @@ class GameBoard {
         }
       }
 
-      result.value = _evaluateMove(this, result, true);
+      result.value = _evaluateMove(result, ownMove);
       if (result.value >= WIN) this._winSymbol = 1 - this._symbol;
     }
     return result;
@@ -104,22 +104,6 @@ class GameBoard {
     return (move == null)
         ? null
         : recordCoordinates(move.row, move.col, ownMove: ownMove);
-  }
-
-  int? revokeCoordinates(int row, int col) {
-    int? originalSymbol = this._board[row][col];
-
-    if (originalSymbol != null) {
-      this._board[row][col] = null;
-      this._symbol = 1 - this._symbol;
-      this._availableMoves++;
-    }
-
-    return originalSymbol;
-  }
-
-  int? revokeMove(GameMove move) {
-    return revokeCoordinates(move.row, move.col);
   }
 
   GameBoard clone() {
@@ -135,13 +119,13 @@ class GameBoard {
     return result;
   }
 
-  int _evaluateMove(GameBoard board, GameMove move, bool ownMove) {
-    List<GameMoveTuple> listOfTuples = _tuplesToEvaluate(board, move);
+  int _evaluateMove(GameMove move, bool ownMove) {
+    List<GameMoveTuple> listOfTuples = _tuplesToEvaluate(move);
 
     int moveValue = 0;
     for (GameMoveTuple tuple in listOfTuples) {
       if (!tuple.bothSymbols) {
-        moveValue += tupleEval[board.winSequenceLength - 1]
+        moveValue += tupleEval[this._winSequenceLength - 1]
             [tuple.symbolCount[move.symbol!]];
       }
       // TODO perhaps I need to compare the original value - we will see ;)
@@ -149,20 +133,20 @@ class GameBoard {
     return ownMove ? moveValue : -1 * moveValue;
   }
 
-  List<GameMoveTuple> _tuplesToEvaluate(GameBoard board, GameMove move) {
+  List<GameMoveTuple> _tuplesToEvaluate(GameMove move) {
     List<GameMoveTuple> result = [];
-    int winSequenceLength = board.winSequenceLength;
+    int winSequenceLength = this._winSequenceLength;
 
     // horizontal
     for (int i = 0; i < winSequenceLength; i++) {
       if (move.col + i - (winSequenceLength - 1) >= 0 &&
-          move.col + i < board.cols) {
+          move.col + i < this._cols) {
         GameMoveTuple tuple = GameMoveTuple();
         for (int j = 0; j < winSequenceLength; j++)
           tuple.add(GameMove(
             row: move.row,
             col: move.col + i - (winSequenceLength - 1) + j,
-            symbol: board.board[move.row]
+            symbol: this._board[move.row]
                 [move.col + i - (winSequenceLength - 1) + j],
           ));
         result.add(tuple);
@@ -172,13 +156,13 @@ class GameBoard {
     // vertical
     for (int i = 0; i < winSequenceLength; i++) {
       if (move.row + i - (winSequenceLength - 1) >= 0 &&
-          move.row + i < board.rows) {
+          move.row + i < this._rows) {
         GameMoveTuple tuple = GameMoveTuple();
         for (int j = 0; j < winSequenceLength; j++)
           tuple.add(GameMove(
             row: move.row + i - (winSequenceLength - 1) + j,
             col: move.col,
-            symbol: board.board[move.row + i - (winSequenceLength - 1) + j]
+            symbol: this._board[move.row + i - (winSequenceLength - 1) + j]
                 [move.col],
           ));
         result.add(tuple);
@@ -189,14 +173,14 @@ class GameBoard {
     for (int i = 0; i < winSequenceLength; i++) {
       if (move.row + i - (winSequenceLength - 1) >= 0 &&
           move.col + i - (winSequenceLength - 1) >= 0 &&
-          move.row + i < board.rows &&
-          move.col + i < board.cols) {
+          move.row + i < this._rows &&
+          move.col + i < this._cols) {
         GameMoveTuple tuple = GameMoveTuple();
         for (int j = 0; j < winSequenceLength; j++)
           tuple.add(GameMove(
             row: move.row + i - (winSequenceLength - 1) + j,
             col: move.col + i - (winSequenceLength - 1) + j,
-            symbol: board.board[move.row + i - (winSequenceLength - 1) + j]
+            symbol: this._board[move.row + i - (winSequenceLength - 1) + j]
                 [move.col + i - (winSequenceLength - 1) + j],
           ));
         result.add(tuple);
@@ -205,17 +189,17 @@ class GameBoard {
 
     // diagonal right_up-left_down
     for (int i = 0; i < winSequenceLength; i++) {
-      if (move.row - i + (winSequenceLength - 1) < board.rows &&
+      if (move.row - i + (winSequenceLength - 1) < this._rows &&
           move.col + i - (winSequenceLength - 1) >= 0 &&
           move.row - i >= 0 &&
-          move.col + i < board.cols) {
+          move.col + i < this._cols) {
         //OK
         GameMoveTuple tuple = GameMoveTuple();
         for (int j = 0; j < winSequenceLength; j++)
           tuple.add(GameMove(
             row: move.row - i + (winSequenceLength - 1) - j,
             col: move.col + i - (winSequenceLength - 1) + j,
-            symbol: board.board[move.row - i + (winSequenceLength - 1) - j]
+            symbol: this._board[move.row - i + (winSequenceLength - 1) - j]
                 [move.col + i - (winSequenceLength - 1) + j],
           ));
         result.add(tuple);

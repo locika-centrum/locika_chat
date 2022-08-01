@@ -8,8 +8,6 @@ import '../providers/app_theme.dart';
 import '../providers/app_settings.dart';
 import './screens/main_screen.dart';
 import './screens/welcome_screen.dart';
-import './screens/game_screen.dart';
-import './screens/settings_screen.dart';
 import './screens/settings/settings_category.dart';
 import './screens/settings/settings_game_size.dart';
 import './screens/chat_room_screen.dart';
@@ -18,6 +16,7 @@ import './screens/login_screen.dart';
 import './screens/register_screen.dart';
 import './screens/network_error_screen.dart';
 import './screens/about_screen.dart';
+import './screens/about_violet_mode_screen.dart';
 
 Logger _log = Logger('main.dart');
 
@@ -30,18 +29,18 @@ Future<void> main() async {
   });
 
   WidgetsFlutterBinding.ensureInitialized();
-  await AppSettings.init();
+  await AppSettings().init();
 
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   static final _router = GoRouter(
-    initialLocation: AppSettings.ageCategory.value == null ? '/welcome' : '/',
+    initialLocation: AppSettings().data.ageCategory == null ? '/welcome' : '/',
     routes: [
       GoRoute(
         path: '/',
-        builder: (context, state) => const MainScreen(),
+        builder: (context, state) => MainScreen(),
       ),
       GoRoute(
         path: '/welcome',
@@ -52,21 +51,8 @@ class MyApp extends StatelessWidget {
         builder: (context, state) => const AboutScreen(),
       ),
       GoRoute(
-        path: '/game',
-        builder: (context, state) {
-          // _log.finest('Initializing new game with size ${AppSettings.gameSize.value}');
-          // Game().newGame(size: AppSettings.gameSize.value);
-
-          return GameScreen(
-            secretEnabled: AppSettings.violetModeOn.value &&
-                AppSettings.isEligibleForVioletMode(),
-            gameSize: AppSettings.gameSize.value,
-          );
-        },
-      ),
-      GoRoute(
-        path: '/settings',
-        builder: (context, state) => const SettingsScreen(),
+        path: '/about_violet_mode',
+        builder: (context, state) => const AboutVioletModeScreen(),
       ),
       GoRoute(
         path: '/settings/category',
@@ -83,9 +69,9 @@ class MyApp extends StatelessWidget {
         builder: (context, state) {
           return LoginScreen(
             nextRoute: '/chat_room',
-            nickName: AppSettings.nickName.value,
-            setCookie: (Cookie cookie) => AppSettings.setCookie(cookie),
-            setNick: (String nickName) => AppSettings.setNickName(nickName),
+            nickName: AppSettings().data.nickName,
+            setCookie: (Cookie cookie) => AppSettings().data.setCookie(cookie),
+            setNick: (String nickName) => AppSettings().data.setNickName(nickName),
           );
         },
       ),
@@ -94,15 +80,15 @@ class MyApp extends StatelessWidget {
         builder: (context, state) {
           return RegisterScreen(
             nextRoute: '/chat_room',
-            setCookie: (Cookie cookie) => AppSettings.setCookie(cookie),
-            setNick: (String nickName) => AppSettings.setNickName(nickName),
+            setCookie: (Cookie cookie) => AppSettings().data.setCookie(cookie),
+            setNick: (String nickName) => AppSettings().data.setNickName(nickName),
           );
         },
       ),
       GoRoute(
         path: '/chat_room',
         builder: (context, state) => ChatRoomScreen(
-          cookie: AppSettings.cookie.value!,
+          cookie: AppSettings().data.cookie!,
         ),
       ),
       GoRoute(
@@ -112,9 +98,9 @@ class MyApp extends StatelessWidget {
 
           // TODO check if chatID is null
           return ChatScreen(
-            nickName: AppSettings.nickName.value!,
-            cookie: AppSettings.cookie.value!,
-            setCookie: (Cookie cookie) => AppSettings.setCookie(cookie),
+            nickName: AppSettings().data.nickName!,
+            cookie: AppSettings().data.cookie!,
+            setCookie: (Cookie cookie) => AppSettings().data.setCookie(cookie),
             advisorID: chatID!,
           );
         },
@@ -131,7 +117,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    _log.finest('Starting with parameters: ${AppSettings.allSettings}');
+    _log.finest('Starting with parameters: ${AppSettings().data}');
     return MaterialApp.router(
       title: 'Locika chat',
       theme: AppTheme.lightTheme,

@@ -15,23 +15,18 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool violetMode = AppSettings.violetModeOn.value;
-  bool showSpecialSection = AppSettings.isEligibleForVioletMode();
+  bool violetMode = AppSettings().data.violetModeOn;
+  bool showSpecialSection = AppSettings().data.isEligibleForVioletMode;
 
   void _afterAgeCategorySelection() {
     setState(() {
-      showSpecialSection = AppSettings.isEligibleForVioletMode();
+      showSpecialSection = AppSettings().data.isEligibleForVioletMode;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: const BackButton(),
-        title: const Text('Nastavení'),
-        elevation: 0,
-      ),
       body: SettingsList(sections: [
         SettingsSection(
           title: const Text('Obecné'),
@@ -39,15 +34,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SettingsTile.navigation(
               leading: const Icon(Icons.face),
               title: const Text('Kategorie'),
-              value: ValueListenableBuilder<int?>(
-                builder: (BuildContext context, int? value, Widget? child) {
-                  _log.finest('Category = ${AppSettings.ageCategory.value}');
-                  return Text(AppSettings.getAgeCategories()[AppSettings
-                          .ageCategory.value ??
-                      AppSettings.getAgeCategories().length - 1]['category']);
-                },
-                valueListenable: AppSettings.ageCategory,
-              ),
+              value: Text(AppSettings().data.ageCategories[
+                  AppSettings().data.ageCategory ??
+                      AppSettings().data.ageCategories.length - 1]['category']),
               onPressed: (context) => GoRouter.of(context).push(
                 '/settings/category',
                 extra: _afterAgeCategorySelection,
@@ -56,13 +45,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SettingsTile.navigation(
               leading: const Icon(Icons.view_comfy),
               title: const Text('Velikost hry'),
-              value: ValueListenableBuilder<int>(
-                builder: (BuildContext context, int value, Widget? child) {
-                  return Text(
-                      AppSettings.getGameSizes()[AppSettings.gameSize.value]);
-                },
-                valueListenable: AppSettings.gameSize,
-              ),
+              value: Text(
+                  AppSettings().data.gameSizes[AppSettings().data.gameSize]),
               onPressed: (context) =>
                   GoRouter.of(context).push('/settings/game_size'),
             ),
@@ -70,8 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               leading: const Icon(Icons.redo),
               title: const Text('Reset score'),
               onPressed: (context) {
-                _log.finest('Reset score');
-                // TODO reset score
+                AppSettings().data.resetScore();
 
                 SnackBar snackBar = const SnackBar(
                   content: Text('Score je vymazané.'),
@@ -87,12 +70,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
             tiles: <SettingsTile>[
               SettingsTile.switchTile(
                 onToggle: (value) => setState(() {
-                  AppSettings.toggleVioletMode();
+                  AppSettings().data.toggleVioletMode();
                 }),
-                initialValue: AppSettings.violetModeOn.value,
+                initialValue: AppSettings().data.violetModeOn,
                 leading: const Icon(Icons.lock),
-                title: const Text('Fialový mód'),
+                title: const Text('Fialový režim'),
               ),
+              if (AppSettings().data.violetModeOn)
+                SettingsTile(
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Fialový režim je prostor, kde si.... bla bla.. dasdadasdsa.',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          GoRouter.of(context).push('/about_violet_mode');
+                        },
+                        child: Text(
+                          'Jak to funguje',
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Colors.blue,
+                                  ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
             ],
           ),
         SettingsSection(
@@ -114,8 +121,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               onPressed: (context) {
-                AppSettings.resetAll();
-                _log.finest('${AppSettings.allSettings}');
+                AppSettings().data.resetAll();
 
                 SnackBar snackBar = const SnackBar(
                   content: Text('Data aplikace jsou smazaná'),

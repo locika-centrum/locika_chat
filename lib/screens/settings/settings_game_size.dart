@@ -11,7 +11,7 @@ class SettingsGameSizeScreen extends StatefulWidget {
 }
 
 class _SettingsGameSizeScreenState extends State<SettingsGameSizeScreen> {
-  int gameSize = AppSettings.gameSize.value;
+  int gameSize = AppSettings().data.gameSize;
 
   @override
   Widget build(BuildContext context) {
@@ -33,14 +33,14 @@ class _SettingsGameSizeScreenState extends State<SettingsGameSizeScreen> {
   List<SettingsTile> _settingTiles(BuildContext context) {
     List<SettingsTile> result = [];
 
-    for (int index = 0; index < AppSettings.getGameSizes().length; index++) {
+    for (int index = 0; index < AppSettings().data.gameSizes.length; index++) {
       result.add(SettingsTile(
-        title: Text(AppSettings.getGameSizes()[index]),
+        title: Text(AppSettings().data.gameSizes[index]),
         trailing:
-            Icon(index == AppSettings.gameSize.value ? Icons.visibility : null),
+            Icon(index == AppSettings().data.gameSize ? Icons.visibility : null),
         onPressed: (context) {
           setState(() {
-            AppSettings.setGameSize(index);
+            AppSettings().data.setGameSize(index);
             gameSize = index;
           });
         },

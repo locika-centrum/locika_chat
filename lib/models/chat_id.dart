@@ -1,4 +1,4 @@
-import '../providers/app_settings.dart';
+import '../providers/app_settingsOLD.dart';
 
 @Deprecated('Should be replaced in new parser')
 class ChatID {

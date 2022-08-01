@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.locika_chat">
+    package="cz.davidsvejda.locikachat">
    <application
-        android:label="locika_chat"
+        android:label="Locika Game"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -31,4 +31,6 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+
+    <uses-permission android:name="android.permissions.INTERNET" android:maxSdkVersion="28" />
 </manifest>

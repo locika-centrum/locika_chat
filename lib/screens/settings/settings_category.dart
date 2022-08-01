@@ -12,8 +12,8 @@ class SettingsCategoryScreen extends StatefulWidget {
 }
 
 class _SettingsCategoryScreenState extends State<SettingsCategoryScreen> {
-  int ageCategory = AppSettings.ageCategory.value ??
-      AppSettings.getAgeCategories().length - 1;
+  int ageCategory = AppSettings().data.ageCategory ??
+      AppSettings().data.ageCategories.length - 1;
 
   @override
   Widget build(BuildContext context) {
@@ -36,15 +36,15 @@ class _SettingsCategoryScreenState extends State<SettingsCategoryScreen> {
     List<SettingsTile> result = [];
 
     for (int index = 0;
-        index < AppSettings.getAgeCategories().length;
+        index < AppSettings().data.ageCategories.length;
         index++) {
       result.add(SettingsTile(
-        title: Text(AppSettings.getAgeCategories()[index]['category']),
+        title: Text(AppSettings().data.ageCategories[index]['category']),
         trailing: Icon(
-            index == AppSettings.ageCategory.value ? Icons.visibility : null),
+            index == AppSettings().data.ageCategory ? Icons.visibility : null),
         onPressed: (context) {
           setState(() {
-            AppSettings.setAgeCategory(index);
+            AppSettings().data.setAgeCategory(index);
             ageCategory = index;
             widget.onChange!();
           });

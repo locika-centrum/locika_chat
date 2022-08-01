@@ -14,7 +14,8 @@ class SecretButton extends StatelessWidget {
     return Opacity(
       opacity: _opacity,
       child: FloatingActionButton(onPressed: () {
-        if (AppSettings.isEligibleForVioletMode() && AppSettings.violetModeOn.value) {
+        if (AppSettings().data.isEligibleForVioletMode &&
+            AppSettings().data.violetModeOn) {
           _showOptions(context);
         }
       }),
