@@ -1,5 +1,3 @@
-import '../providers/app_settingsOLD.dart';
-
 @Deprecated('Should be replaced in new parser')
 class ChatID {
   late String advisorID;

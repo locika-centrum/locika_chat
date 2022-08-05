@@ -130,7 +130,7 @@ class AppSettingsData {
 
   TicTacToeScore getTicTacToeScore(int gameSize) =>
       _tictactoeScores[gameSize] ?? TicTacToeScore(0, 0, 0);
-  SlidingScore getSliding(int gameSize) =>
+  SlidingScore getSlidingScore(int gameSize) =>
       _slidingScores[gameSize] ?? SlidingScore(0, 0);
 
   void setTicTacToeScore(int gameSize, TicTacToeScore score) {

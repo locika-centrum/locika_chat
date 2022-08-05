@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:provider/provider.dart';
 
 import '../game/player_ai.dart';
 import '../game/game_board.dart';
 import '../game/game_move.dart';
+import '../game/game_status.dart';
 
 Logger _log = Logger('GameBoard Widget');
 
 class GameBoardWidget extends StatefulWidget {
   final int gameSize;
-  final Function changeScore;
 
   const GameBoardWidget({
     int this.gameSize = 0,
-    required this.changeScore,
     Key? key,
   }) : super(key: key);
 
@@ -23,13 +23,17 @@ class GameBoardWidget extends StatefulWidget {
 
 class _GameBoardWidgetState extends State<GameBoardWidget> {
   late GameBoard gameBoard;
+  late bool _isLocked;
   final PlayerAI playerAI = PlayerAI();
-  bool _isLocked = false;
 
   @override
-  void initState() {
-    gameBoard = GameBoard(size: widget.gameSize);
-    super.initState();
+  void didChangeDependencies() {
+    if (Provider.of<GameStatus>(context).lastMove == null) {
+      gameBoard = GameBoard(size: widget.gameSize);
+      _isLocked = false;
+    }
+
+    super.didChangeDependencies();
   }
 
   @override
@@ -80,7 +84,6 @@ class _GameBoardWidgetState extends State<GameBoardWidget> {
   }
 
   void _gridItemTapped(int row, int col) {
-    _log.finest('Move: ($row, $col) ${_isLocked ? "is locked (cannot be made)" : "by human"}');
     if (!_isLocked) {
       _isLocked = true;
 
@@ -90,22 +93,28 @@ class _GameBoardWidgetState extends State<GameBoardWidget> {
             : gameBoard.recordMove(playerAI.move(gameBoard));
 
         if (move != null) {
-          _log.fine('BEST MOVE = ${move}');
+          _log.finest('Move (${player == 0 ? "human" : "ai"}): ${move}');
           setState(() {});
 
           if (gameBoard.winSymbol != null) {
             // Move was winning move
-            _log.finest('*** VICTORY for ${gameBoard.winSymbol} ***');
-            widget.changeScore(gameBoard.winSymbol == 0 ? 1 : -1);
+            move.winningMove = player == 0 ? 1 : -1;
+
+            context.read<GameStatus>().move(move);
             return;
           } else {
             if (gameBoard.availableMoves == 0) {
               // No further moves are possible
-              _log.finest('*** DRAW ***');
-              widget.changeScore(0);
+              move.winningMove = 0;
+
+              context.read<GameStatus>().move(move);
               return;
             }
           }
+        } else {
+          // Human player has selected already occupied cell
+          _log.finest('Move (${player == 0 ? "human" : "ai"}): (${row}, ${col}) is not valid');
+          break;
         }
       }
       _isLocked = false;

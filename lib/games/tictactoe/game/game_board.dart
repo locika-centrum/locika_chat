@@ -86,10 +86,16 @@ class GameBoard {
       this._symbol = 1 - this._symbol;
       this._availableMoves--;
 
+      // Record surroundings in the bit map - based on sequence length mark
+      // all fields in 8 directions as surrounding for next moves
       int diameter = (this._winSequenceLength / 2).floor();
       for (int i = -diameter; i <= diameter; i++) {
         for (int j = -diameter; j <= diameter; j++) {
-          if (row + i >= 0 && row + i < _rows && col + j >= 0 && col + j < _cols)
+          if (row + i >= 0 &&
+              row + i < _rows &&
+              col + j >= 0 &&
+              col + j < _cols &&
+              (i == 0 || j == 0 || i.abs() == j.abs()))
             this._surrounding[row + i][col + j] = true;
         }
       }

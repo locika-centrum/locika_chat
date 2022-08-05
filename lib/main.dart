@@ -31,7 +31,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppSettings().init();
 
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -71,7 +71,8 @@ class MyApp extends StatelessWidget {
             nextRoute: '/chat_room',
             nickName: AppSettings().data.nickName,
             setCookie: (Cookie cookie) => AppSettings().data.setCookie(cookie),
-            setNick: (String nickName) => AppSettings().data.setNickName(nickName),
+            setNick: (String nickName) =>
+                AppSettings().data.setNickName(nickName),
           );
         },
       ),
@@ -81,7 +82,8 @@ class MyApp extends StatelessWidget {
           return RegisterScreen(
             nextRoute: '/chat_room',
             setCookie: (Cookie cookie) => AppSettings().data.setCookie(cookie),
-            setNick: (String nickName) => AppSettings().data.setNickName(nickName),
+            setNick: (String nickName) =>
+                AppSettings().data.setNickName(nickName),
           );
         },
       ),
@@ -117,7 +119,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    _log.finest('Starting with parameters: ${AppSettings().data}');
+    _log.config('Starting with parameters: ${AppSettings().data}');
     return MaterialApp.router(
       title: 'Locika chat',
       theme: AppTheme.lightTheme,

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:provider/provider.dart';
 
 import '../game/game_board.dart';
 import '../game/game_move.dart';
+import '../game/game_status.dart';
 
 Logger _log = Logger('GameBoard Widget');
 
 class GameBoardWidget extends StatefulWidget {
   final int gameSize;
-  final Function changeScore;
 
   const GameBoardWidget({
     int this.gameSize = 0,
-    required this.changeScore,
     Key? key,
   }) : super(key: key);
 
@@ -25,16 +25,18 @@ class _GameBoardWidgetState extends State<GameBoardWidget> {
   late bool _isLocked;
 
   @override
-  void initState() {
-    gameBoard = GameBoard(settingsSize: widget.gameSize);
-    _isLocked = gameBoard.evaluateBoard();
-    super.initState();
+  void didChangeDependencies() {
+    // Reset if the lastMove has been wiped
+    if (Provider.of<GameStatus>(context).lastMove == null) {
+      gameBoard = GameBoard(settingsSize: widget.gameSize);
+      _isLocked = gameBoard.evaluateBoard();
+    }
+
+    super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    _log.finest('Board: ${gameBoard.board}');
-
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: GridView.builder(
@@ -86,7 +88,9 @@ class _GameBoardWidgetState extends State<GameBoardWidget> {
 
       if (move != null) {
         _isLocked = gameBoard.evaluateBoard();
-        widget.changeScore(gameBoard.moves, _isLocked);
+        move.winningMove = _isLocked;
+        context.read<GameStatus>().move(move);
+
         setState(() {});
       }
     }

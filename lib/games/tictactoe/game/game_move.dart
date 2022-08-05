@@ -3,6 +3,7 @@ class GameMove {
   final int col;
   int? symbol;
   int value = 0;
+  int? winningMove = null;
 
   GameMove({
     required this.row,

@@ -18,13 +18,7 @@ class WelcomeOptions extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Vyber si úroveň obtížnosti a začni hrát.',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          SizedBox(
-            height: 16,
-          ),
+          Spacer(),
           LimitedBox(
             maxHeight: 250,
             child: ListView.builder(
@@ -40,6 +34,7 @@ class WelcomeOptions extends StatelessWidget {
               },
             ),
           ),
+          Spacer(),
         ],
       ),
     );

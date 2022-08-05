@@ -2,13 +2,12 @@ import 'dart:math';
 import 'package:logging/logging.dart';
 
 import 'game_move.dart';
-import 'game_move_tuple.dart';
 import 'game_board.dart';
 
 const INT_INFINITY = 999999;
 const WIN = 200000;
 const MIN_DEPTH = 1;
-const MAX_DEPTH = 1;
+const MAX_DEPTH = 3;
 
 const List<List<int>> tupleEval = [
   [], // not applicable
@@ -24,13 +23,16 @@ class PlayerAI {
   GameMove? move(GameBoard board) {
     List<GameMove> bestMoves = [];
     int bestMoveValue = -INT_INFINITY;
+    DateTime start = DateTime.now();
+    DateTime interim1 = start, interim2;
+    GameMove? result;
 
     List<GameMove> possibleMoves = _possibleMoves(board);
-    _log.finest('Possible moves: ${possibleMoves.length}');
+    _log.finer('Possible moves: ${possibleMoves.length}');
     for (GameMove move in possibleMoves) {
       GameBoard newBoard = board.clone();
       GameMove? newMove = newBoard.recordMove(move);
-      int moveValue = _MinMax(newBoard, newMove!, possibleMoves.length > 50 ? MIN_DEPTH : MAX_DEPTH, -INT_INFINITY, INT_INFINITY, false);
+      int moveValue = _MinMax(newBoard, newMove!, possibleMoves.length > 25 ? MIN_DEPTH : MAX_DEPTH, -INT_INFINITY, INT_INFINITY, false);
       if (moveValue > bestMoveValue) {
         bestMoves.clear();
         bestMoveValue = moveValue;
@@ -38,13 +40,15 @@ class PlayerAI {
       }
     }
 
+    result = bestMoves.length == 0 ? null : bestMoves[Random().nextInt(bestMoves.length)];
+    _log.fine('move (${result}) out of ${bestMoves.length} available moves selected in ${DateTime.now().difference(start).inMilliseconds} ms');
     return bestMoves.length == 0 ? null : bestMoves[Random().nextInt(bestMoves.length)];
   }
 
   int _MinMax(GameBoard board, GameMove move, int depth, int alpha, int beta, bool maximizingPlayer) {
     // int moveValue = _evaluateMove(board, move, !maximizingPlayer);
-    _log.finest(
-        'MinMax${List.filled(2 * (3 - depth), " ").join()} - ${board.board} / ${move} -> ${move.value}');
+    // _log.finest(
+    //     'MinMax${List.filled(2 * (3 - depth), " ").join()} - ${board.board} / ${move} -> ${move.value}');
 
     if (depth == 0 || move.value.abs() >= WIN || board.availableMoves == 0) {
       return move.value;
@@ -88,110 +92,6 @@ class PlayerAI {
                 GameMove(row: row, col: col, symbol: board.activeSymbol));
           }
         }
-      }
-    }
-
-    return result;
-  }
-
-  List<GameMove> _possibleMovesOLD(GameBoard board) {
-    List<GameMove> result = [];
-
-    for (int row = 0; row < board.rows; row++) {
-      for (int col = 0; col < board.cols; col++) {
-        if (board.board[row][col] == null) {
-          result.add(GameMove(row: row, col: col, symbol: board.activeSymbol));
-        }
-      }
-    }
-
-    return result;
-  }
-
-  int _evaluateMove(GameBoard board, GameMove move, bool ownMove) {
-    List<GameMoveTuple> listOfTuples = _tuplesToEvaluate(board, move);
-
-    int moveValue = 0;
-    for (GameMoveTuple tuple in listOfTuples) {
-      if (!tuple.bothSymbols) {
-        moveValue += tupleEval[board.winSequenceLength - 1]
-        [tuple.symbolCount[move.symbol!]];
-      }
-      // TODO perhaps I need to compare the original value - we will see ;)
-    }
-    return ownMove ? moveValue : -1 * moveValue;
-  }
-
-  List<GameMoveTuple> _tuplesToEvaluate(GameBoard board, GameMove move) {
-    List<GameMoveTuple> result = [];
-    int winSequenceLength = board.winSequenceLength;
-
-    // horizontal
-    for (int i = 0; i < winSequenceLength; i++) {
-      if (move.col + i - (winSequenceLength - 1) >= 0 &&
-          move.col + i < board.cols) {
-        GameMoveTuple tuple = GameMoveTuple();
-        for (int j = 0; j < winSequenceLength; j++)
-          tuple.add(GameMove(
-            row: move.row,
-            col: move.col + i - (winSequenceLength - 1) + j,
-            symbol: board.board[move.row]
-            [move.col + i - (winSequenceLength - 1) + j],
-          ));
-        result.add(tuple);
-      }
-    }
-
-    // vertical
-    for (int i = 0; i < winSequenceLength; i++) {
-      if (move.row + i - (winSequenceLength - 1) >= 0 &&
-          move.row + i < board.rows) {
-        GameMoveTuple tuple = GameMoveTuple();
-        for (int j = 0; j < winSequenceLength; j++)
-          tuple.add(GameMove(
-            row: move.row + i - (winSequenceLength - 1) + j,
-            col: move.col,
-            symbol: board.board[move.row + i - (winSequenceLength - 1) + j]
-            [move.col],
-          ));
-        result.add(tuple);
-      }
-    }
-
-    // diagonal left_up-right_down
-    for (int i = 0; i < winSequenceLength; i++) {
-      if (move.row + i - (winSequenceLength - 1) >= 0 &&
-          move.col + i - (winSequenceLength - 1) >= 0 &&
-          move.row + i < board.rows &&
-          move.col + i < board.cols) {
-        GameMoveTuple tuple = GameMoveTuple();
-        for (int j = 0; j < winSequenceLength; j++)
-          tuple.add(GameMove(
-            row: move.row + i - (winSequenceLength - 1) + j,
-            col: move.col + i - (winSequenceLength - 1) + j,
-            symbol: board.board[move.row + i - (winSequenceLength - 1) + j]
-            [move.col + i - (winSequenceLength - 1) + j],
-          ));
-        result.add(tuple);
-      }
-    }
-
-    // diagonal right_up-left_down
-    for (int i = 0; i < winSequenceLength; i++) {
-      if (move.row - i + (winSequenceLength - 1) < board.rows &&
-          move.col + i - (winSequenceLength - 1) >= 0 &&
-          move.row - i >= 0 &&
-          move.col + i < board.cols) {
-        //OK
-        GameMoveTuple tuple = GameMoveTuple();
-        for (int j = 0; j < winSequenceLength; j++)
-          tuple.add(GameMove(
-            row: move.row - i + (winSequenceLength - 1) - j,
-            col: move.col + i - (winSequenceLength - 1) + j,
-            symbol: board.board[move.row - i + (winSequenceLength - 1) - j]
-            [move.col + i - (winSequenceLength - 1) + j],
-          ));
-        result.add(tuple);
       }
     }
 

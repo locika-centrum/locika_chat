@@ -15,9 +15,23 @@ class WelcomeScreen extends StatelessWidget {
         title: const Text('Hraj s příšerou'),
       ),
       body: TwoSectionUI(
-        firstSection: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 64),
-          child: SvgPicture.asset('assets/images/monster_02.svg'),
+        firstSection: Column(
+          children: [
+            Spacer(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 64),
+              child: SvgPicture.asset(
+                'assets/images/monster_02.svg',
+                height: 220,
+              ),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Vyber si úroveň obtížnosti a začni hrát.',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            Spacer(),
+          ],
         ),
         secondSection: WelcomeOptions(),
       ),

@@ -1,45 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:logging/logging.dart';
+import 'package:provider/provider.dart';
 
-import '../../providers/app_settings.dart';
-import '../../models/app_settings_data.dart';
+import './game/game_status.dart';
 import './widgets/game_board_widget.dart';
 import './widgets/game_score_widget.dart';
 
-Logger _log = Logger('GameScreen');
-
-class TicTacToeScreen extends StatefulWidget {
+class TicTacToeScreen extends StatelessWidget {
   final int gameSize;
 
-  TicTacToeScreen({
-    this.gameSize = 0,
-    Key? key,
-  }) : super(key: key);
+  TicTacToeScreen({this.gameSize = 0, Key? key}) : super(key: key);
 
   @override
-  State<TicTacToeScreen> createState() => _TicTacToeScreenState();
-}
-
-class _TicTacToeScreenState extends State<TicTacToeScreen> {
-  // Wins / Loses / Number of games
-  late TicTacToeScore _score;
-
-  @override
-  void initState() {
-    _score = AppSettings().data.getTicTacToeScore(widget.gameSize);
-    _log.finest(
-        'Game Statistics: (${this._score.noOfWins}, ${this._score.noOfLosses}, ${this._score.noOfGames})');
-
-    super.initState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => GameStatus(this.gameSize))
+        ],
+        child: Column(
+          children: [
+            Expanded(
+              flex: 3,
+              child: GameBoardWidget(gameSize: this.gameSize,),
+            ),
+            Expanded(
+              child: GameScoreWidget(),
+            )
+          ],
+        ),
+      ),
+    );
   }
 
+/*
+      body: Column(
+        children: [
+          Expanded(
+            child: GameScoreWidget(),
+          )
+        ],
+      ),
+    );
+  }
+ */
+
+/*
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         children: [
           Expanded(
-            flex: 5,
+            flex: 3,
             child: GameBoardWidget(
               gameSize: this.widget.gameSize,
               changeScore: changeScore,
@@ -49,6 +61,7 @@ class _TicTacToeScreenState extends State<TicTacToeScreen> {
             child: GameScoreWidget(
               scorePlayer: _score.noOfWins,
               scoreOpponent: _score.noOfLosses,
+              totalGames: _score.noOfGames,
             ),
           )
         ],
@@ -77,4 +90,5 @@ class _TicTacToeScreenState extends State<TicTacToeScreen> {
     AppSettings().data.setTicTacToeScore(widget.gameSize, _score);
     setState(() {});
   }
+ */
 }
