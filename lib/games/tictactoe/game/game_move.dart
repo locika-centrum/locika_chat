@@ -11,7 +11,7 @@ class GameMove {
     this.symbol,
   });
 
-  String toString() => '($row, $col) - [$symbol] > $value';
+  String toString() => '[$row, $col] with $symbol > $value}';
 
   bool equal(GameMove move) =>
       this.row == move.row &&

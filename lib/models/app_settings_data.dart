@@ -31,6 +31,21 @@ class SlidingScore {
   }
 }
 
+class ReversiScore {
+  int noOfWins;
+  int noOfLosses;
+  int noOfGames;
+
+  ReversiScore(this.noOfWins, this.noOfLosses, this.noOfGames);
+
+  List<String> toStringList() => [noOfWins.toString(), noOfLosses.toString(), noOfGames.toString()];
+
+  @override
+  String toString() {
+    return '[${noOfWins}, ${noOfLosses}, ${noOfGames}]';
+  }
+}
+
 class AppSettingsData {
   SharedPreferences preferences;
 
@@ -71,6 +86,7 @@ class AppSettingsData {
   late int _gameSize;
   List _tictactoeScores = [null, null, null, null];
   List _slidingScores = [null, null, null, null];
+  List _reversiScores = [null, null, null, null];
 
   // Chat parameters
   String? _nickName;
@@ -132,6 +148,8 @@ class AppSettingsData {
       _tictactoeScores[gameSize] ?? TicTacToeScore(0, 0, 0);
   SlidingScore getSlidingScore(int gameSize) =>
       _slidingScores[gameSize] ?? SlidingScore(0, 0);
+  ReversiScore getReversiScore(int gameSize) =>
+      _reversiScores[gameSize] ?? ReversiScore(0, 0, 0);
 
   void setTicTacToeScore(int gameSize, TicTacToeScore score) {
     _tictactoeScores[gameSize] = score;
@@ -141,6 +159,11 @@ class AppSettingsData {
   void setSlidingScore(int gameSize, SlidingScore score) {
     _slidingScores[gameSize] = score;
     preferences.setStringList('sliding_${gameSize}', score.toStringList());
+  }
+
+  void setReversiScore(int gameSize, ReversiScore score) {
+    _reversiScores[gameSize] = score;
+    preferences.setStringList('reversi_${gameSize}', score.toStringList());
   }
 
   // Setters
@@ -162,9 +185,9 @@ class AppSettingsData {
     preferences.setBool('violet_mode_info', _showVioletModeInfo);
   }
 
-  void toggleVioletModeInfo() {
-    _showVioletModeInfo = !_showVioletModeInfo;
-    preferences.setBool('violet_mode_info', _showVioletModeInfo);
+  void set showVioletModeInfo(bool showInfo) {
+    _showVioletModeInfo = showInfo;
+    preferences.setBool('violet_mode_info', showInfo);
   }
 
   void setNickName(String? nickName) {

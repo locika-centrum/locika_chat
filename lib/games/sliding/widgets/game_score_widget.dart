@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../game/game_status.dart';
+import './game_total_score_widget.dart';
 
 class GameScoreWidget extends StatelessWidget {
   const GameScoreWidget({Key? key}) : super(key: key);
@@ -11,29 +12,35 @@ class GameScoreWidget extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text('P O Č E T'),
-            Text('T A H Ů'),
-            SizedBox(height: 8),
-            Text(
-              '${context.select<GameStatus, int>((model) => model.moveCount)}',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+        GestureDetector(
+          onTap: () { _showAllScores(context); },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text('P O Č E T'),
+              Text('T A H Ů'),
+              SizedBox(height: 8),
+              Text(
+                '${context.select<GameStatus, int>((model) => model.moveCount)}',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+            ],
+          ),
         ),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text('N E J M É N Ě'),
-            Text('T A H Ů'),
-            SizedBox(height: 8),
-            Text(
-              '${context.read<GameStatus>().score.noOfMoves == 0 ? "-" : context.read<GameStatus>().score.noOfMoves}',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+        GestureDetector(
+          onTap: () { _showAllScores(context); },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text('N E J M É N Ě'),
+              Text('T A H Ů'),
+              SizedBox(height: 8),
+              Text(
+                '${context.read<GameStatus>().score.noOfMoves == 0 ? "-" : context.read<GameStatus>().score.noOfMoves}',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+            ],
+          ),
         ),
         Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -50,5 +57,11 @@ class GameScoreWidget extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  void _showAllScores(BuildContext context) {
+    showModalBottomSheet(context: context, builder: (_) {
+      return GameTotalScoreWidget();
+    });
   }
 }

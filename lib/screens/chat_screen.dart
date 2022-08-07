@@ -8,6 +8,8 @@ import 'package:bubble/bubble.dart';
 import '../services/neziskovky_parser.dart';
 import '../models/chat_response.dart';
 import '../models/chat_message.dart';
+import '../widgets/emergency_call.dart';
+import '../widgets/chat_navigation_bar.dart';
 
 Logger _log = Logger('ChatScreen');
 
@@ -32,6 +34,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   StreamController<List<ChatMessage>> controller =
       StreamController<List<ChatMessage>>();
+  ScrollController _listScrollController = ScrollController();
   final TextEditingController _inputController = TextEditingController();
   bool sendButton = false;
 
@@ -115,6 +118,11 @@ class _ChatScreenState extends State<ChatScreen> {
       }
 
       controller.add(result.data);
+      if (isReady) {
+        Future.delayed(Duration(seconds: 1), () {
+          _listScrollController.jumpTo(_listScrollController.position.maxScrollExtent);
+        });
+      }
     }
   }
 
@@ -123,9 +131,13 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
-        title: Text('Chat s ${widget.advisorID}'),
+        title: Text('Chat'),
+        actions: [
+          EmergencyCallWidget(),
+        ],
         elevation: 0,
       ),
+      bottomNavigationBar: ChatNavigationBar(),
       body: isReady
           ? StreamBuilder(
               stream: controller.stream,
@@ -137,6 +149,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       child: SafeArea(
                         child: snapshot.data != null
                             ? ListView.builder(
+                                controller: _listScrollController,
                                 itemCount: snapshot.data?.length,
                                 itemBuilder: (context, index) {
                                   return Padding(
@@ -145,11 +158,13 @@ class _ChatScreenState extends State<ChatScreen> {
                                       horizontal: 8,
                                     ),
                                     child: _buildChatItem(
-                                        snapshot.data![index], context),
+                                        snapshot.data![index], context, index),
                                   );
                                 },
                               )
-                            : const Center(child: CircularProgressIndicator()),
+                            : const Center(
+                                child: CircularProgressIndicator(),
+                              ),
                       ),
                     ),
                     SafeArea(
@@ -236,23 +251,34 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Bubble _buildChatItem(ChatMessage message, BuildContext context) {
+  Widget _buildChatItem(ChatMessage message, BuildContext context, int index) {
     _log.finest('${message.sysMessage} > ${message.message}');
+    if (index == 0)
+      return Center(child: Text('${message.dateTime.day}.${message.dateTime.month}.${message.dateTime.year}'));
+
     return Bubble(
       nip: message.sysMessage == widget.nickName
           ? BubbleNip.rightBottom
           : BubbleNip.leftBottom,
       color: message.sysMessage == 'Pracovník chatu'
-          ? Colors.lime
-          : (message.sysMessage == widget.nickName ? Colors.lightBlue.shade200 : null),
+          ? Colors.grey.shade200
+          : (message.sysMessage == widget.nickName
+              ? Colors.green.shade100
+              : null),
       alignment: message.sysMessage == widget.nickName
           ? Alignment.topRight
           : Alignment.topLeft,
-      child: Text(message.message,
-          style: Theme.of(context)
-              .textTheme
-              .bodyMedium
-              ?.copyWith(color: Colors.black)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(message.message,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(color: Colors.black)),
+          Text(message.time, style: TextStyle(color: Colors.black45),),
+        ],
+      ),
     );
   }
 }

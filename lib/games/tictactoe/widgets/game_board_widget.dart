@@ -89,8 +89,8 @@ class _GameBoardWidgetState extends State<GameBoardWidget> {
 
       for (int player = 0; player <= 1; player++) {
         GameMove? move = (player == 0)
-            ? gameBoard.recordCoordinates(row, col)
-            : gameBoard.recordMove(playerAI.move(gameBoard));
+            ? gameBoard.recordCoordinates(row, col, false)
+            : gameBoard.recordMove(playerAI.move(gameBoard), true);
 
         if (move != null) {
           _log.finest('Move (${player == 0 ? "human" : "ai"}): ${move}');

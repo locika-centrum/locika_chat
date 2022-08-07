@@ -20,7 +20,7 @@ class TicTacToeScreen extends StatelessWidget {
         child: Column(
           children: [
             Expanded(
-              flex: 3,
+              flex: 5,
               child: GameBoardWidget(gameSize: this.gameSize,),
             ),
             Expanded(
@@ -31,64 +31,4 @@ class TicTacToeScreen extends StatelessWidget {
       ),
     );
   }
-
-/*
-      body: Column(
-        children: [
-          Expanded(
-            child: GameScoreWidget(),
-          )
-        ],
-      ),
-    );
-  }
- */
-
-/*
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            flex: 3,
-            child: GameBoardWidget(
-              gameSize: this.widget.gameSize,
-              changeScore: changeScore,
-            ),
-          ),
-          Expanded(
-            child: GameScoreWidget(
-              scorePlayer: _score.noOfWins,
-              scoreOpponent: _score.noOfLosses,
-              totalGames: _score.noOfGames,
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  // Increase score
-  // -1 ... loss
-  //  0 ... draw
-  //  1 ... win
-  void changeScore(int status) {
-    switch (status) {
-      case -1:
-        _score.noOfLosses++;
-        _score.noOfGames++;
-        break;
-      case 0:
-        _score.noOfGames++;
-        break;
-      case 1:
-        _score.noOfWins++;
-        _score.noOfGames++;
-        break;
-    }
-    AppSettings().data.setTicTacToeScore(widget.gameSize, _score);
-    setState(() {});
-  }
- */
 }

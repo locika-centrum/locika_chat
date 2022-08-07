@@ -306,6 +306,7 @@ Future<ChatResponse<ChatMessage>> getChatMessages({
         advisorID: advisorID,
         chatID: chatID,
         time: time.text.trim(),
+        dateTime: DateTime.parse(time.attributes.values.first),
         sysMessage: sysMessage.text.trim(),
         message: message != null ? message.text.trim() : '',
       ));

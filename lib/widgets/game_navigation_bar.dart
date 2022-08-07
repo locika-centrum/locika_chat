@@ -16,13 +16,14 @@ class _GameNavigationBarState extends State<GameNavigationBar> {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       elevation: 0,
+      backgroundColor: Colors.grey.shade200,
       currentIndex: _currentIndex,
       onTap: _onTap,
       type: BottomNavigationBarType.fixed,
       items: [
         BottomNavigationBarItem(icon: Icon(Icons.videogame_asset_outlined), label: 'Piškvorky'),
         BottomNavigationBarItem(icon: Icon(Icons.videogame_asset_outlined), label: 'Puzzle',),
-        BottomNavigationBarItem(icon: Icon(Icons.videogame_asset_outlined), label: 'Něco bude',),
+        BottomNavigationBarItem(icon: Icon(Icons.videogame_asset_outlined), label: 'Reversi',),
         BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Nastavení',),
       ],
     );

@@ -20,7 +20,7 @@ class SlidingPuzzleScreen extends StatelessWidget {
         child: Column(
           children: [
             Expanded(
-              flex: 3,
+              flex: 5,
               child: GameBoardWidget(gameSize: this.gameSize),
             ),
             Expanded(

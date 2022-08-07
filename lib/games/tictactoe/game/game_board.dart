@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:logging/logging.dart';
 
 import './game_move.dart';
@@ -12,19 +11,21 @@ const List<List<int>> tupleEval = [
   [], // not applicable
   [], // not applicable
   [0, 1, 1751, WIN], // three in row
-  [0, 1, 511, 1751, WIN], // four in row
-  [0, 1, 73, 511, 1751, WIN], // five in row
+  [0, 1, 511, 5000, WIN], // four in row
+  [0, 1, 73, 850, 7000, WIN], // five in row
 ];
 
 class GameBoard {
   final int size;
   late List<List<int?>> _board;
   late List<List<bool>> _surrounding;
+  late int _startSymbol;
   late int _symbol;
   late int _winSequenceLength;
   late int _rows, _cols;
   late int _availableMoves;
   int? _winSymbol;
+  int _boardValue = 0;
 
   List<List<int?>> get board => this._board;
   List<List<bool>> get surrounding => this._surrounding;
@@ -34,9 +35,11 @@ class GameBoard {
   int get availableMoves => this._availableMoves;
   int get winSequenceLength => this._winSequenceLength;
   int? get winSymbol => this._winSymbol;
+  int get boardValue => this._boardValue;
 
-  GameBoard({required int this.size, int? startSymbol}) {
-    this._symbol = startSymbol ?? Random().nextInt(1);
+  GameBoard({required int this.size}) {
+    this._startSymbol = 1;
+    this._symbol = this._startSymbol;
     switch (this.size) {
       case 1:
         this._rows = this._cols = 5;
@@ -76,67 +79,101 @@ class GameBoard {
     this._availableMoves = this._rows * this._cols;
   }
 
-  GameMove? recordCoordinates(int row, int col, {bool ownMove = true}) {
+  GameMove? recordCoordinates(int row, int col, bool aiPlayer) {
     GameMove? result;
 
     if (this._board[row][col] == null) {
-      result = GameMove(row: row, col: col, symbol: this._symbol);
-
       this._board[row][col] = this._symbol;
+
+      result = GameMove(row: row, col: col, symbol: this._symbol);
+      _evaluateBoard(result);
+      result.value = (aiPlayer && this._startSymbol == this._symbol ||
+                  !aiPlayer && this._startSymbol != this._symbol
+              ? 1
+              : -1) *
+          this._boardValue;
       this._symbol = 1 - this._symbol;
       this._availableMoves--;
 
-      // Record surroundings in the bit map - based on sequence length mark
-      // all fields in 8 directions as surrounding for next moves
-      int diameter = (this._winSequenceLength / 2).floor();
-      for (int i = -diameter; i <= diameter; i++) {
-        for (int j = -diameter; j <= diameter; j++) {
-          if (row + i >= 0 &&
-              row + i < _rows &&
-              col + j >= 0 &&
-              col + j < _cols &&
-              (i == 0 || j == 0 || i.abs() == j.abs()))
-            this._surrounding[row + i][col + j] = true;
+      if (result.value.abs() < WIN) {
+        // Record surroundings in the bit map - based on sequence length mark
+        // all fields in 8 directions as surrounding for next moves
+        int diameter = (this._winSequenceLength / 2).floor();
+        for (int i = -diameter; i <= diameter; i++) {
+          for (int j = -diameter; j <= diameter; j++) {
+            if (row + i >= 0 &&
+                row + i < _rows &&
+                col + j >= 0 &&
+                col + j < _cols &&
+                (i == 0 || j == 0 || i.abs() == j.abs()))
+              this._surrounding[row + i][col + j] = true;
+          }
         }
       }
-
-      result.value = _evaluateMove(result, ownMove);
-      if (result.value >= WIN) this._winSymbol = 1 - this._symbol;
     }
     return result;
   }
 
-  GameMove? recordMove(GameMove? move, {bool ownMove = true}) {
-    return (move == null)
+  GameMove? recordMove(GameMove? move, bool aiPlayer) {
+    return move == null
         ? null
-        : recordCoordinates(move.row, move.col, ownMove: ownMove);
+        : recordCoordinates(move.row, move.col, aiPlayer);
   }
 
   GameBoard clone() {
-    GameBoard result = GameBoard(size: this.size, startSymbol: this._symbol);
+    GameBoard result =
+        GameBoard(size: this.size);
+
+    // Copy board
     for (int row = 0; row < result._rows; row++) {
       for (int col = 0; col < result._cols; col++) {
         result._board[row][col] = this._board[row][col];
         result._surrounding[row][col] = this._surrounding[row][col];
       }
     }
+
+    // Set additional values
+    result._symbol = this._symbol;
     result._availableMoves = this._availableMoves;
+    result._boardValue = this._boardValue;
 
     return result;
   }
 
-  int _evaluateMove(GameMove move, bool ownMove) {
-    List<GameMoveTuple> listOfTuples = _tuplesToEvaluate(move);
-
+  void _evaluateBoard(GameMove lastMove) {
+    List<GameMoveTuple> listOfTuples = _tuplesToEvaluate(lastMove);
+    int originalValue = 0;
     int moveValue = 0;
+
     for (GameMoveTuple tuple in listOfTuples) {
-      if (!tuple.bothSymbols) {
-        moveValue += tupleEval[this._winSequenceLength - 1]
-            [tuple.symbolCount[move.symbol!]];
+      // Before the move there it was a nonzero valuation
+      if (tuple.symbolCount[lastMove.symbol!] - 1 == 0 ||
+          tuple.symbolCount[1 - lastMove.symbol!] == 0) {
+        originalValue += tupleEval[this._winSequenceLength - 1]
+                [tuple.symbolCount[lastMove.symbol!] - 1] -
+            tupleEval[this._winSequenceLength - 1]
+                [tuple.symbolCount[1 - lastMove.symbol!]];
       }
-      // TODO perhaps I need to compare the original value - we will see ;)
+      if (!tuple.bothSymbols) {
+        int tupleValue = tupleEval[this._winSequenceLength - 1]
+            [tuple.symbolCount[lastMove.symbol!]];
+        if (tupleValue >= WIN) {
+          moveValue = WIN;
+          break;
+        }
+        moveValue += tupleValue;
+      }
     }
-    return ownMove ? moveValue : -1 * moveValue;
+
+    if (moveValue >= WIN) {
+      this._boardValue = (this._startSymbol == lastMove.symbol ? 1 : -1) * WIN;
+      this._winSymbol = lastMove.symbol;
+    } else {
+      this._boardValue += (this._startSymbol == lastMove.symbol ? 1 : -1) *
+          (moveValue - originalValue);
+    }
+
+    // _log.finest('MOVE: ${lastMove}, BOARD VALUE: ${this._boardValue}, WINNER: ${this._winSymbol}, BOARD = ${this._board}');
   }
 
   List<GameMoveTuple> _tuplesToEvaluate(GameMove move) {
