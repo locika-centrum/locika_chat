@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'package:logging/logging.dart';
 
 import '../game/game_board.dart';
 import '../game/game_move.dart';
 import '../game/game_status.dart';
 import '../game/player_ai.dart';
+
+Logger _log = Logger('Reversi GameBoard Widget');
 
 class GameBoardWidget extends StatefulWidget {
   final int gameSize;
@@ -29,6 +32,12 @@ class _GameBoardWidgetState extends State<GameBoardWidget> {
     if (Provider.of<GameStatus>(context).lastMove == null) {
       gameBoard = GameBoard(settingsSize: widget.gameSize);
       _isLocked = false;
+    }
+    if (Provider.of<GameStatus>(context).humanIsPassing) {
+      gameBoard.pass();
+      Future.delayed(const Duration(milliseconds: 50), () {
+        _computerMove();
+      });
     }
 
     super.didChangeDependencies();
@@ -71,9 +80,11 @@ class _GameBoardWidgetState extends State<GameBoardWidget> {
       child: LayoutBuilder(builder: (context, constraint) {
         if (gameBoard.board[row][col] == null) return Container();
 
-        return SvgPicture.asset(gameBoard.board[row][col] == 0
-            ? 'assets/images/black.svg'
-            : 'assets/images/white.svg',);
+        return SvgPicture.asset(
+          gameBoard.board[row][col] == 0
+              ? 'assets/images/black.svg'
+              : 'assets/images/white.svg',
+        );
       }),
     );
   }
@@ -83,12 +94,51 @@ class _GameBoardWidgetState extends State<GameBoardWidget> {
       _isLocked = true;
       GameMove? move = gameBoard.recordCoordinates(row, col, false);
       if (move != null) {
+        move.lastMove = gameBoard.availableMoves == 0;
+        _log.finest('Move (human): ${move}');
         setState(() {});
 
         context.read<GameStatus>().move(move, gameBoard.symbolCount);
+        if (!move.lastMove) {
+          Future.delayed(const Duration(milliseconds: 50), () {
+            _computerMove();
+          });
+        }
+      } else {
+        _log.finest('Move (human): (${row}, ${col}) is not valid');
       }
 
       _isLocked = false;
     }
+  }
+
+  void _computerMove() {
+    GameMove? move = gameBoard.recordMove(this.playerAI.move(this.gameBoard), true);
+    if (move != null) {
+      move.lastMove = gameBoard.availableMoves == 0;
+      _log.finest('Move (ai): ${move}');
+      setState(() {});
+
+      context.read<GameStatus>().move(move, gameBoard.symbolCount);
+
+      if (!move.lastMove) {
+        // Evaluate if the human opponent can make move
+        if (this.playerAI
+            .possibleMoves(this.gameBoard)
+            .isEmpty) {
+          context.read<GameStatus>().cannotMove(this.gameBoard.activeSymbol);
+        }
+      }
+    } else {
+      _log.finest('Move (ai): no possible move -> pass');
+      context.read<GameStatus>().cannotMove(this.gameBoard.activeSymbol);
+      gameBoard.pass();
+
+      // Evaluate if the human opponent can make move
+      if (this.playerAI.possibleMoves(this.gameBoard).isEmpty) {
+        context.read<GameStatus>().cannotMove(this.gameBoard.activeSymbol);
+      }
+    }
+    _isLocked = false;
   }
 }

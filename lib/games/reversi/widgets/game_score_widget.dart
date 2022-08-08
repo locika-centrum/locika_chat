@@ -37,8 +37,8 @@ class GameScoreWidget extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(''),
               Text('S C O R E'),
+              Text(''),
               SizedBox(height: 8),
               Text(
                 '${context.select<GameStatus, int>((model) => model.score.noOfWins)} : ${context.select<GameStatus, int>((model) => model.score.noOfLosses)}',
@@ -51,14 +51,24 @@ class GameScoreWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             IconButton(
-              iconSize: 50,
-              onPressed: (context.select<GameStatus, GameMove?>(
-                              (model) => model.lastMove) !=
-                          null &&
-                      context.read<GameStatus>().lastMove!.winningMove != null)
+              iconSize: 35,
+              padding: EdgeInsets.only(left: 8, right: 8, bottom: 8),
+              onPressed: (context
+                      .select<GameStatus, bool>((model) => model.gameOver))
                   ? context.read<GameStatus>().reset
                   : null,
               icon: Icon(Icons.refresh),
+            ),
+            IconButton(
+              iconSize: 35,
+              padding: EdgeInsets.only(left: 8, right: 8, bottom: 16),
+              onPressed: (context.select<GameStatus, bool>(
+                      (model) => model.noAvailableMove))
+                  ? () {
+                      context.read<GameStatus>().pass();
+                    }
+                  : null,
+              icon: Icon(Icons.skip_next),
             ),
           ],
         ),
@@ -67,8 +77,10 @@ class GameScoreWidget extends StatelessWidget {
   }
 
   void _showAllScores(BuildContext context) {
-    showModalBottomSheet(context: context, builder: (_) {
-      return GameTotalScoreWidget();
-    });
+    showModalBottomSheet(
+        context: context,
+        builder: (_) {
+          return GameTotalScoreWidget();
+        });
   }
 }

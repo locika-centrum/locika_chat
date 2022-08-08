@@ -3,7 +3,7 @@ class GameMove {
   final int col;
   final int symbol;
   int value = 0;
-  int? winningMove = null;
+  bool lastMove = false;
 
   GameMove({
     required this.row,

@@ -50,7 +50,7 @@ class GameTotalScoreWidget extends StatelessWidget {
         Center(child: Text('${AppSettings().data.getSlidingScore(i).noOfGames}')),
       ]));
       totalMoves += AppSettings().data.getSlidingScore(i).noOfMoves;
-      totalGames += AppSettings().data.getTicTacToeScore(i).noOfGames;
+      totalGames += AppSettings().data.getSlidingScore(i).noOfGames;
     }
     result.add(TableRow(children: [Text(''), Text(''), Text('')]));
     result.add(TableRow(children: [

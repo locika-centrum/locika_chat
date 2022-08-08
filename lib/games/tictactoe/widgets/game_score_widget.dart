@@ -18,8 +18,8 @@ class GameScoreWidget extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(''),
               Text('S C O R E'),
+              Text(''),
               SizedBox(height: 8),
               Text(
                 '${context.select<GameStatus, int>((model) => model.score.noOfWins)} : ${context.select<GameStatus, int>((model) => model.score.noOfLosses)}',

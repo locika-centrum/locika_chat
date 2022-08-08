@@ -7,7 +7,7 @@ import '../game/game_board.dart';
 import '../game/game_move.dart';
 import '../game/game_status.dart';
 
-Logger _log = Logger('GameBoard Widget');
+Logger _log = Logger('TicTacToe GameBoard Widget');
 
 class GameBoardWidget extends StatefulWidget {
   final int gameSize;

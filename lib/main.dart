@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 
@@ -120,6 +121,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _log.config('Starting with parameters: ${AppSettings().data}');
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
     return MaterialApp.router(
       title: 'Locika chat',
       theme: AppTheme.lightTheme,

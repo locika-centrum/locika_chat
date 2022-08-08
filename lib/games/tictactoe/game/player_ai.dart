@@ -9,7 +9,7 @@ const WIN = 200000;
 const MIN_DEPTH = 2;
 const MAX_DEPTH = 3;
 
-Logger _log = Logger('AIPlayer');
+Logger _log = Logger('tictactoe AIPlayer');
 
 class PlayerAI {
   GameMove? move(GameBoard board) {

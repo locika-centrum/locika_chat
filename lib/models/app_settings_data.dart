@@ -9,7 +9,8 @@ class TicTacToeScore {
 
   TicTacToeScore(this.noOfWins, this.noOfLosses, this.noOfGames);
 
-  List<String> toStringList() => [noOfWins.toString(), noOfLosses.toString(), noOfGames.toString()];
+  List<String> toStringList() =>
+      [noOfWins.toString(), noOfLosses.toString(), noOfGames.toString()];
 
   @override
   String toString() {
@@ -38,7 +39,8 @@ class ReversiScore {
 
   ReversiScore(this.noOfWins, this.noOfLosses, this.noOfGames);
 
-  List<String> toStringList() => [noOfWins.toString(), noOfLosses.toString(), noOfGames.toString()];
+  List<String> toStringList() =>
+      [noOfWins.toString(), noOfLosses.toString(), noOfGames.toString()];
 
   @override
   String toString() {
@@ -127,6 +129,14 @@ class AppSettingsData {
       } else {
         _slidingScores[i] = null;
       }
+
+      score = preferences.getStringList('reversi_${i}');
+      if (score != null && score.length == 3) {
+        _reversiScores[i] = ReversiScore(
+            int.parse(score[0]), int.parse(score[1]), int.parse(score[2]));
+      } else {
+        _reversiScores[i] = null;
+      }
     }
   }
 
@@ -212,7 +222,7 @@ class AppSettingsData {
   }
 
   // Other methods
-  bool get isEligibleForVioletMode => ageCategory! <= ageCategories.length - 1;
+  bool get isEligibleForVioletMode => ageCategory! < ageCategories.length - 1;
 
   Future<void> resetScore() async {
     for (int i = 0; i < gameSizes.length; i++) {
@@ -238,7 +248,8 @@ class AppSettingsData {
         'chat_id = ${_chatID}, '
         'cookie = ${_cookie}, '
         'tictactoe = ${_tictactoeScores}, '
-        'sliding = ${_slidingScores}'
+        'sliding = ${_slidingScores}, '
+        'reversi = ${_reversiScores}'
         '}';
   }
 }

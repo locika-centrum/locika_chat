@@ -25,7 +25,7 @@ class HowItWorksDialog extends StatelessWidget {
                   child: Bubble(
                     nip: BubbleNip.leftBottom,
                     alignment: Alignment.topLeft,
-                    color: Colors.grey.shade300,
+                    color: Theme.of(context).dialogBackgroundColor,
                     child:
                         Text('Ahoj, nechceš zjistit, jak funguje fialový režim?'),
                   ),

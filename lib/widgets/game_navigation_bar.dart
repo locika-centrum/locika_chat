@@ -16,7 +16,8 @@ class _GameNavigationBarState extends State<GameNavigationBar> {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       elevation: 0,
-      backgroundColor: Colors.grey.shade200,
+      // backgroundColor: Colors.grey.shade200,
+      backgroundColor: Theme.of(context).dialogBackgroundColor,
       currentIndex: _currentIndex,
       onTap: _onTap,
       type: BottomNavigationBarType.fixed,
